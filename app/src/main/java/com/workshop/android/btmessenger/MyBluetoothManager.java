@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.UUID;
 
 public class MyBluetoothManager extends BroadcastReceiver {
@@ -50,6 +51,14 @@ public class MyBluetoothManager extends BroadcastReceiver {
         mListeners = new ArrayList<>();
         mReceiverRegistered = false;
         mListenThread = null;
+    }
+
+    public void enableBluetooth(Context context) {
+        if (mBluetoothAdapter != null && !mBluetoothAdapter.isEnabled()) {
+            // Enable Bluetooth
+            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            context.startActivity(intent);
+        }
     }
 
     public boolean checkBluetoothAvailability(){
@@ -180,6 +189,18 @@ public class MyBluetoothManager extends BroadcastReceiver {
         if (mListenThread != null) {
             mListenThread.cancel();
         }
+    }
+
+    public ArrayList<String>  getPairedDevicesAddress() {
+        ArrayList<String> ret = new ArrayList<>();
+        if (mBluetoothAdapter == null) {
+            return ret;
+        }
+        Set<BluetoothDevice> bondedDevices = mBluetoothAdapter.getBondedDevices();
+        for (BluetoothDevice device : bondedDevices) {
+            ret.add(device.getName() + "\n" + device.getAddress());
+        }
+        return ret;
     }
 
     @Override

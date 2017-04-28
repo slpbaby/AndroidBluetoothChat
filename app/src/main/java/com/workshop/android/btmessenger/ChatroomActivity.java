@@ -45,6 +45,11 @@ public class ChatroomActivity extends AppCompatActivity implements MyBluetoothLi
         mBtManager.addListener(this.getApplicationContext(), this);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mBtManager.removeListener(this.getApplicationContext(), this);
+    }
 
     public void onDeviceFound(String device, String address) {
         // Do nothing
