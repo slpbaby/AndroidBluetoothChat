@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -95,6 +96,8 @@ public class MainActivity extends AppCompatActivity implements MyBluetoothListen
             } catch (IOException e) {
                 // Do something
                 Log.d(TAG, "Failed to connect Device", e);
+                Toast.makeText(getApplicationContext(), "Failed to connect Device", Toast.LENGTH_LONG).show();
+                return;
             }
             startChat(address);
         }
@@ -112,6 +115,8 @@ public class MainActivity extends AppCompatActivity implements MyBluetoothListen
             } catch (IOException e) {
                 // Do something
                 Log.d(TAG, "Failed to connect Device", e);
+                Toast.makeText(getApplicationContext(), "Failed to connect Device", Toast.LENGTH_LONG).show();
+                return;
             }
             startChat(address);
         }
@@ -193,6 +198,8 @@ public class MainActivity extends AppCompatActivity implements MyBluetoothListen
                 manager.allowDiscover(MainActivity.this);
             } catch (IOException e) {
                 // do something
+                Toast.makeText(getApplicationContext(), "Failed to enable discovery", Toast.LENGTH_LONG).show();
+                return;
             }
         }
     };
