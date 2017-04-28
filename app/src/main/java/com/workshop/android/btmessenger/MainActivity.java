@@ -1,6 +1,5 @@
 package com.workshop.android.btmessenger;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
@@ -14,10 +13,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements MyBluetoothListener {
+    private static final String TAG = "BTCHAT - MAIN";
 
     private ArrayAdapter<String> mNewDevicesAdapter;
+    private ArrayAdapter<String> mPairedDevicesAdapter;
     private MyBluetoothManager mBtManager;
 
     private Button mStartScanBtn, mStopScanBtn, mAllowDiscoverBtn;
@@ -26,6 +28,11 @@ public class MainActivity extends AppCompatActivity implements MyBluetoothListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mPairedDevicesAdapter = new ArrayAdapter<>(this, R.layout.device_name);
+        ListView pairedDeviceList = (ListView)findViewById(R.id.paired_devices_list);
+        pairedDeviceList.setAdapter(mPairedDevicesAdapter);
+        pairedDeviceList.setOnItemClickListener(mPairedDeviceClickListener);
 
         mNewDevicesAdapter = new ArrayAdapter<>(this, R.layout.device_name);
         ListView newDeviceList = (ListView)findViewById(R.id.new_devices_list);
@@ -39,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements MyBluetoothListen
             // Disable the start scan button because bluetooth is not available
             mStartScanBtn.setEnabled(false);
         }
+        mBtManager.enableBluetooth(getApplicationContext());
         mStopScanBtn = (Button)findViewById(R.id.stop_scan_btn);
         mStopScanBtn.setEnabled(false);
 
@@ -47,19 +55,24 @@ public class MainActivity extends AppCompatActivity implements MyBluetoothListen
         mStartScanBtn.setOnClickListener(mStartScan);
         mStopScanBtn.setOnClickListener(mStopScan);
         mAllowDiscoverBtn.setOnClickListener(mAllowDiscover);
+
+        mBtManager.addListener(this.getApplicationContext(), this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mBtManager.addListener(this.getApplicationContext(), this);
+
+        mPairedDevicesAdapter.clear();
+        ArrayList<String> pairedDevices = mBtManager.getPairedDevicesAddress();
+        for (String device : pairedDevices) {
+            mPairedDevicesAdapter.add(device);
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        //mBtManager.stopDiscover();
-        //mBtManager.removeListener(this.getApplicationContext(), this);
     }
 
     @Override
@@ -67,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements MyBluetoothListen
         super.onDestroy();
         mBtManager.stopDiscover();
         mBtManager.removeListener(this.getApplicationContext(), this);
-        //mBtManager.stopAll();
+//        mBtManager.stopAll();
     }
 
     private AdapterView.OnItemClickListener mDeviceClickListener = new AdapterView.OnItemClickListener() {
@@ -81,14 +94,35 @@ public class MainActivity extends AppCompatActivity implements MyBluetoothListen
                 mBtManager.connectDevice(address);
             } catch (IOException e) {
                 // Do something
-                Log.d("BTMANAGER", "Failed to connect Device", e);
+                Log.d(TAG, "Failed to connect Device", e);
             }
             startChat(address);
         }
     };
 
+    private AdapterView.OnItemClickListener mPairedDeviceClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            // Get the device MAC address, which is the last 17 chars in the View
+            String info = ((TextView) view).getText().toString();
+            String address = info.substring(info.length() - 17);
+
+            try {
+                mBtManager.connectDevice(address);
+            } catch (IOException e) {
+                // Do something
+                Log.d(TAG, "Failed to connect Device", e);
+            }
+            startChat(address);
+        }
+    };
+
+
     public void onDeviceFound(String device, String address) {
-        mNewDevicesAdapter.add(device + "\n" + address);
+        String txt = device + "\n" + address;
+        if (mPairedDevicesAdapter.getPosition(txt) < 0) {
+            mNewDevicesAdapter.add(device + "\n" + address);
+        }
     }
 
     public void onDeviceScanComplete() {
@@ -105,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements MyBluetoothListen
     }
 
     public void onConnected(String targetAddress) {
-        Log.d("BTMANAGER", "MainActivity onConnected : " + targetAddress);
+        Log.d(TAG, "MainActivity onConnected : " + targetAddress);
         startChat(targetAddress);
     }
 
@@ -115,14 +149,12 @@ public class MainActivity extends AppCompatActivity implements MyBluetoothListen
 
     private void startChat(final String targetAddress) {
         if (Looper.myLooper() == Looper.getMainLooper()) {
-            Log.d("BTMANAGER", "start Chat in UI Thread");
             Intent intent = new Intent(MainActivity.this, ChatroomActivity.class);
             Bundle bundle = new Bundle();
             bundle.putString(MyBluetoothManager.EXTRA_BT_ADDR, targetAddress);
             intent.putExtras(bundle);
             startActivity(intent);
         } else {
-            Log.d("BTMANAGER", "Try to run on UI Thread");
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
