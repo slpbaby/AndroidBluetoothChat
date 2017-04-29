@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity implements MyBluetoothListen
 
     private ArrayAdapter<String> mNewDevicesAdapter;
     private ArrayAdapter<String> mPairedDevicesAdapter;
+    private ArrayAdapter<String> mHistoryAdapter;
     private MyBluetoothManager mBtManager;
 
     private Button mStartScanBtn, mStopScanBtn, mAllowDiscoverBtn;
@@ -39,6 +40,11 @@ public class MainActivity extends AppCompatActivity implements MyBluetoothListen
         ListView newDeviceList = (ListView)findViewById(R.id.new_devices_list);
         newDeviceList.setAdapter(mNewDevicesAdapter);
         newDeviceList.setOnItemClickListener(mDeviceClickListener);
+
+        mHistoryAdapter = new ArrayAdapter<>(this, R.layout.device_name);
+        ListView historyList = (ListView)findViewById(R.id.history_list);
+        historyList.setAdapter(mHistoryAdapter);
+        historyList.setOnItemClickListener(mHistoryClickListener);
 
         mBtManager = MyBluetoothManager.getInstance();
 
@@ -81,7 +87,6 @@ public class MainActivity extends AppCompatActivity implements MyBluetoothListen
         super.onDestroy();
         mBtManager.stopDiscover();
         mBtManager.removeListener(this.getApplicationContext(), this);
-//        mBtManager.stopAll();
     }
 
     private AdapterView.OnItemClickListener mDeviceClickListener = new AdapterView.OnItemClickListener() {
@@ -118,6 +123,17 @@ public class MainActivity extends AppCompatActivity implements MyBluetoothListen
                 Toast.makeText(getApplicationContext(), "Failed to connect Device", Toast.LENGTH_LONG).show();
                 return;
             }
+            startChat(address);
+        }
+    };
+
+    private AdapterView.OnItemClickListener mHistoryClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            // Get the device MAC address, which is the last 17 chars in the View
+            String info = ((TextView) view).getText().toString();
+            String address = info.substring(info.length() - 17);
+
             startChat(address);
         }
     };
