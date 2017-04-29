@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.io.IOException;
@@ -37,6 +38,7 @@ public class MyBluetoothManager extends BroadcastReceiver {
     private ArrayList<BtSocketAddress> mBluetoothSockets;
 
     private ListenThread mListenThread;
+    private Context mContext;
 
     public synchronized static MyBluetoothManager getInstance() {
         if (sInstance == null) {
@@ -51,6 +53,7 @@ public class MyBluetoothManager extends BroadcastReceiver {
         mListeners = new ArrayList<>();
         mReceiverRegistered = false;
         mListenThread = null;
+        mContext = null;
     }
 
     public void enableBluetooth(Context context) {
@@ -106,6 +109,7 @@ public class MyBluetoothManager extends BroadcastReceiver {
     }
 
     public void addListener(Context context, MyBluetoothListener listener) {
+        mContext = context.getApplicationContext();
         mListeners.add(listener);
         synchronized (this) {
             // register broadcast receiver if not register yet
@@ -149,12 +153,22 @@ public class MyBluetoothManager extends BroadcastReceiver {
     }
 
     public void onMessageRecv(String address, String message) {
+        if (mContext != null) {
+            // Store conversation into db
+            DBHelper dbHelper = new DBHelper(mContext);
+            dbHelper.insertConversation(address, Conversation.TYPE_RECV, SystemClock.currentThreadTimeMillis(), message);
+        }
         for (MyBluetoothListener listener : mListeners) {
             listener.onMessageReceived(address, message);
         }
     }
 
     public void onMessageSent(String address, String message) {
+        if (mContext != null) {
+            // Store conversation into db
+            DBHelper dbHelper = new DBHelper(mContext);
+            dbHelper.insertConversation(address, Conversation.TYPE_SENT, SystemClock.currentThreadTimeMillis(), message);
+        }
         for (MyBluetoothListener listener : mListeners) {
             listener.onMessageSent(address, message);
         }
