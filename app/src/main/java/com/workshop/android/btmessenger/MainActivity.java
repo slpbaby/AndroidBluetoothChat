@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity implements MyBluetoothListen
 
     private ArrayAdapter<String> mNewDevicesAdapter;
     private ArrayAdapter<String> mPairedDevicesAdapter;
-    private ArrayAdapter<String> mHistoryAdapter;
+//    private ArrayAdapter<String> mHistoryAdapter;
     private MyBluetoothManager mBtManager;
 
     private Button mStartScanBtn, mStopScanBtn, mAllowDiscoverBtn;
@@ -41,10 +41,10 @@ public class MainActivity extends AppCompatActivity implements MyBluetoothListen
         newDeviceList.setAdapter(mNewDevicesAdapter);
         newDeviceList.setOnItemClickListener(mDeviceClickListener);
 
-        mHistoryAdapter = new ArrayAdapter<>(this, R.layout.device_name);
-        ListView historyList = (ListView)findViewById(R.id.history_list);
-        historyList.setAdapter(mHistoryAdapter);
-        historyList.setOnItemClickListener(mHistoryClickListener);
+//        mHistoryAdapter = new ArrayAdapter<>(this, R.layout.device_name);
+//        ListView historyList = (ListView)findViewById(R.id.history_list);
+//        historyList.setAdapter(mHistoryAdapter);
+//        historyList.setOnItemClickListener(mHistoryClickListener);
 
         mBtManager = MyBluetoothManager.getInstance();
 
@@ -76,12 +76,12 @@ public class MainActivity extends AppCompatActivity implements MyBluetoothListen
             mPairedDevicesAdapter.add(device);
         }
 
-        DBHelper dbHelper = new DBHelper(this);
-        mHistoryAdapter.clear();
-        ArrayList<ContactProfile> historyDevices = dbHelper.getAllProfiles();
-        for (ContactProfile device : historyDevices) {
-            mHistoryAdapter.add(device.mAddress);
-        }
+//        DBHelper dbHelper = new DBHelper(this);
+//        mHistoryAdapter.clear();
+//        ArrayList<ContactProfile> historyDevices = dbHelper.getAllProfiles();
+//        for (ContactProfile device : historyDevices) {
+//            mHistoryAdapter.add(device.mAddress);
+//        }
     }
 
     @Override

@@ -45,29 +45,29 @@ public class ChatroomActivity extends AppCompatActivity implements MyBluetoothLi
 
         mBtManager.addListener(this.getApplicationContext(), this);
 
-        DBHelper dbHelper = new DBHelper(getApplicationContext());
-        ContactProfile profile = dbHelper.getProfileByAddress(mAddress);
-        if (profile == null) {
-            // insert user into database
-            // TODO: insert correct user name
-            dbHelper.insertUser(mAddress, mAddress);
-        }
+//        DBHelper dbHelper = new DBHelper(getApplicationContext());
+//        ContactProfile profile = dbHelper.getProfileByAddress(mAddress);
+//        if (profile == null) {
+//            // insert user into database
+//            // TODO: insert correct user name
+//            dbHelper.insertUser(mAddress, mAddress);
+//        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        DBHelper dbHelper = new DBHelper(getApplicationContext());
-        ArrayList<Conversation> conversations = dbHelper.getConversationsByAddress(mAddress);
-        for (Conversation conversation : conversations) {
-            if (conversation.isRecvMessage()) {
-                onMessageReceived(mAddress, conversation.getMessage());
-            } else if (conversation.isSentMessage()) {
-                onMessageSent(mAddress, conversation.getMessage());
-            } else {
-                Toast.makeText(getApplicationContext(), "Error Message Type ", Toast.LENGTH_LONG).show();
-            }
-        }
+//        DBHelper dbHelper = new DBHelper(getApplicationContext());
+//        ArrayList<Conversation> conversations = dbHelper.getConversationsByAddress(mAddress);
+//        for (Conversation conversation : conversations) {
+//            if (conversation.isRecvMessage()) {
+//                onMessageReceived(mAddress, conversation.getMessage());
+//            } else if (conversation.isSentMessage()) {
+//                onMessageSent(mAddress, conversation.getMessage());
+//            } else {
+//                Toast.makeText(getApplicationContext(), "Error Message Type ", Toast.LENGTH_LONG).show();
+//            }
+//        }
     }
 
     @Override
