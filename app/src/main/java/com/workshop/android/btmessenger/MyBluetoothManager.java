@@ -60,6 +60,7 @@ public class MyBluetoothManager extends BroadcastReceiver {
         if (mBluetoothAdapter != null && !mBluetoothAdapter.isEnabled()) {
             // Enable Bluetooth
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
         }
     }

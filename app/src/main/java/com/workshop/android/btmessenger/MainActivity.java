@@ -75,6 +75,13 @@ public class MainActivity extends AppCompatActivity implements MyBluetoothListen
         for (String device : pairedDevices) {
             mPairedDevicesAdapter.add(device);
         }
+
+        DBHelper dbHelper = new DBHelper(this);
+        mHistoryAdapter.clear();
+        ArrayList<ContactProfile> historyDevices = dbHelper.getAllProfiles();
+        for (ContactProfile device : historyDevices) {
+            mHistoryAdapter.add(device.mAddress);
+        }
     }
 
     @Override

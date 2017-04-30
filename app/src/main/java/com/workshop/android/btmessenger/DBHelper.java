@@ -74,7 +74,8 @@ public class DBHelper extends SQLiteOpenHelper{
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res = db.rawQuery("select * from " + TABLE_NAME_USER + " where "
-                + COLUMN_ADDRESS + "=" + address, null);
+                + COLUMN_ADDRESS + "=\"" + address + "\"", null);
+        res.moveToFirst();
         if (res.getCount() <= 0) {
             return null;
         }
@@ -90,7 +91,7 @@ public class DBHelper extends SQLiteOpenHelper{
         ArrayList<Conversation> ret = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery("select * from " + TABLE_NAME_CONVERSATION + " where "
-                + COLUMN_ADDRESS + "=" + address, null);
+                + COLUMN_ADDRESS + "=\"" + address + "\"", null);
 
         res.moveToFirst();
         while (!res.isAfterLast()) {
@@ -100,7 +101,22 @@ public class DBHelper extends SQLiteOpenHelper{
             ret.add(new Conversation(type, msg, time));
             res.moveToNext();
         }
+        res.close();
+        return ret;
+    }
 
+    public ArrayList<ContactProfile> getAllProfiles() {
+        ArrayList<ContactProfile> ret = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from " + TABLE_NAME_USER, null);
+        res.moveToFirst();
+
+        while (!res.isAfterLast()) {
+            String address = res.getString(res.getColumnIndex(COLUMN_ADDRESS));
+            ret.add(getProfileByAddress(address));
+            res.moveToNext();
+        }
+        res.close();
         return ret;
     }
 }
